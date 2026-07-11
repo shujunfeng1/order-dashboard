@@ -1,0 +1,39 @@
+{
+  "email": {
+    "imap_server": "",
+    "imap_port": 993,
+    "email_account": "",
+    "email_password": "",
+    "sender_filter": "",
+    "subject_filter": "【卡单】【数据】",
+    "attachment_keyword": ".xlsx"
+  },
+  "excel": {
+    "sheet_name": "累计卡单",
+    "field_mapping": {
+      "客户ID": "A",
+      "客户省份": "D",
+      "订单编号": "E",
+      "实付GMV": "G",
+      "异常原因分类": "N",
+      "业绩归属": "O",
+      "下单BD工号": "Q",
+      "下单BD": "R",
+      "下单BD组别": "S",
+      "大区": "T"
+    },
+    "blank_replacement": "公海",
+    "blank_fields": ["大区", "客户省份", "下单BD组别"]
+  },
+  "dashboard": {
+    "grouping_fields": ["大区", "客户省份", "下单BD组别"],
+    "metrics": {
+      "客户数": {"column": "客户ID", "agg": "nunique"},
+      "卡单订单数": {"column": "订单编号", "agg": "count"},
+      "涉及销售数": {"column": "下单BD工号", "agg": "nunique"},
+      "涉及实付GMV": {"column": "实付GMV", "agg": "sum"}
+    },
+    "filter_fields": ["大区", "业绩归属", "异常原因分类"],
+    "chart_fields": ["大区", "异常原因分类", "业绩归属"]
+  }
+}
