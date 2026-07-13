@@ -23,13 +23,15 @@ from excel_parser import parse_excel
 from data_processor import process_data, save_json
 
 
-def run_pipeline(excel_file=None, config=None):
+def run_pipeline(excel_file=None, config=None, output_dir=None, exports_dir=None):
     """
     执行完整数据管道。
 
     Args:
         excel_file: Excel 文件路径。如果为 None，则从邮件获取。
         config: 配置字典。如果为 None，则从配置文件加载。
+        output_dir: JSON 输出目录。默认读环境变量 OUTPUT_DIR，否则 web/static/data。
+        exports_dir: Excel 输出目录。默认读环境变量 EXPORTS_DIR，否则 web/static/exports。
 
     Returns:
         str: 生成的 JSON 文件路径
@@ -42,8 +44,9 @@ def run_pipeline(excel_file=None, config=None):
 
     # 项目根目录
     project_root = Path(__file__).parent.parent
-    data_dir = project_root / "web" / "static" / "data"
-    exports_dir = project_root / "web" / "static" / "exports"
+    # 输出目录：优先参数 > 环境变量 > 默认本地路径
+    data_dir = Path(output_dir) if output_dir else Path(os.environ.get("OUTPUT_DIR", project_root / "web" / "static" / "data"))
+    exports_dir = Path(exports_dir) if exports_dir else Path(os.environ.get("EXPORTS_DIR", project_root / "web" / "static" / "exports"))
     data_dir.mkdir(parents=True, exist_ok=True)
     exports_dir.mkdir(parents=True, exist_ok=True)
 
