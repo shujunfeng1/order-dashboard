@@ -32,13 +32,15 @@ jobs:
           IMAP_PORT: ${{ secrets.IMAP_PORT }}
           EMAIL_ACCOUNT: ${{ secrets.EMAIL_ACCOUNT }}
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          OUTPUT_DIR: docs
+          EXPORTS_DIR: docs
         run: python pipeline/run_pipeline.py
 
       - name: 提交更新数据
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/dashboard_data.json docs/*.xlsx
+          git add docs/dashboard_data.json docs/index.html docs/*.xlsx
           if git diff --staged --quiet; then
             echo "数据未变化，跳过提交"
           else
