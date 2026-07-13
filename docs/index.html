@@ -176,6 +176,30 @@
             padding-bottom: 12px;
             border-bottom: 1px solid var(--faint-gray);
         }
+        .chart-title-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--faint-gray);
+        }
+        .chart-title-bar .chart-title { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+        .metric-toggle { display: flex; gap: 0; }
+        .metric-btn {
+            background: transparent;
+            color: var(--gray);
+            border: 1px solid var(--border);
+            padding: 4px 12px;
+            cursor: pointer;
+            font-size: 11px;
+            font-family: var(--body-font);
+            letter-spacing: 0.06em;
+            transition: all 0.2s;
+        }
+        .metric-btn:first-child { border-right: none; }
+        .metric-btn.active { color: var(--white); background: var(--dark-blue); border-color: var(--dark-blue); }
+        .metric-btn:hover:not(.active) { color: var(--dark-blue); }
         .chart-container { width: 100%; height: 260px; }
 
         /* ===== Table ===== */
@@ -406,15 +430,33 @@
 
         <div class="chart-row">
             <div class="chart-card">
-                <div class="chart-title">大区卡单分布</div>
+                <div class="chart-title-bar">
+                    <span class="chart-title">大区卡单分布</span>
+                    <div class="metric-toggle">
+                        <button class="metric-btn active" onclick="switchChartMetric('region','order_count',this)">订单数</button>
+                        <button class="metric-btn" onclick="switchChartMetric('region','gmv',this)">实付GMV</button>
+                    </div>
+                </div>
                 <div class="chart-container" id="chartRegion"></div>
             </div>
             <div class="chart-card">
-                <div class="chart-title">异常原因分类</div>
+                <div class="chart-title-bar">
+                    <span class="chart-title">异常原因分类</span>
+                    <div class="metric-toggle">
+                        <button class="metric-btn active" onclick="switchChartMetric('reason','order_count',this)">订单数</button>
+                        <button class="metric-btn" onclick="switchChartMetric('reason','gmv',this)">实付GMV</button>
+                    </div>
+                </div>
                 <div class="chart-container" id="chartReason"></div>
             </div>
             <div class="chart-card">
-                <div class="chart-title">业绩归属分布</div>
+                <div class="chart-title-bar">
+                    <span class="chart-title">业绩归属分布</span>
+                    <div class="metric-toggle">
+                        <button class="metric-btn active" onclick="switchChartMetric('ownership','order_count',this)">订单数</button>
+                        <button class="metric-btn" onclick="switchChartMetric('ownership','gmv',this)">实付GMV</button>
+                    </div>
+                </div>
                 <div class="chart-container" id="chartOwnership"></div>
             </div>
         </div>
@@ -491,6 +533,9 @@
         let detailSearchText = '';
         let aggPage = 1;
         let detailPage = 1;
+        let regionMetric = 'order_count';    // 大区图当前指标
+        let reasonMetric = 'order_count';    // 异常原因图当前指标
+        let ownershipMetric = 'order_count'; // 业绩归属图当前指标
         const pageSize = 15;
 
         const CHART_COLORS = ['#1A365D', '#C4A35A', '#C04A1A', '#5B8DB8', '#8B7355', '#2A6F3F', '#7B6D9E'];
@@ -537,6 +582,16 @@
             document.getElementById('filterRegion').value = '';
             document.getElementById('filterOwnership').value = '';
             document.getElementById('filterReason').value = '';
+            // 重置三个图指标为订单数
+            regionMetric = 'order_count';
+            reasonMetric = 'order_count';
+            ownershipMetric = 'order_count';
+            // 每组切换按钮恢复第一个（订单数）为 active
+            document.querySelectorAll('.metric-toggle').forEach(toggle => {
+                toggle.querySelectorAll('.metric-btn').forEach((btn, i) => {
+                    btn.classList.toggle('active', i === 0);
+                });
+            });
             aggPage = 1; detailPage = 1; applyFilters();
         }
 
@@ -585,103 +640,183 @@
         let chartRegion, chartReason, chartOwnership;
 
         function updateCharts(data) {
-            // --- 大区柱状图 ---
+            // 聚合三个图的维度数据（同时算 order_count + gmv）
             const regionMap = {};
+            const reasonMap = {};
+            const ownershipMap = {};
             data.forEach(row => {
+                const gmv = parseFloat(row['实付GMV']) || 0;
+                // 大区
                 const r = row['大区'] || '公海';
-                regionMap[r] = (regionMap[r] || 0) + 1;
+                if (!regionMap[r]) regionMap[r] = { order_count: 0, gmv: 0 };
+                regionMap[r].order_count += 1;
+                regionMap[r].gmv += gmv;
+                // 异常原因
+                const reason = row['异常原因分类'] || '未知';
+                if (!reasonMap[reason]) reasonMap[reason] = { order_count: 0, gmv: 0 };
+                reasonMap[reason].order_count += 1;
+                reasonMap[reason].gmv += gmv;
+                // 业绩归属
+                const own = row['业绩归属'] || '未知';
+                if (!ownershipMap[own]) ownershipMap[own] = { order_count: 0, gmv: 0 };
+                ownershipMap[own].order_count += 1;
+                ownershipMap[own].gmv += gmv;
             });
-            const regionEntries = Object.entries(regionMap).sort((a, b) => b[1] - a[1]);
+            renderRegionChart(regionMap);
+            renderReasonChart(reasonMap);
+            renderOwnershipChart(ownershipMap);
+        }
+
+        // GMV 格式化辅助
+        function fmtGMV(v) {
+            return '\u00a5' + v.toLocaleString('zh-CN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+        function fmtGMVShort(v) {
+            return v >= 10000 ? '\u00a5' + (v/10000).toFixed(1) + '万' : '\u00a5' + v;
+        }
+
+        // 大区柱状图
+        function renderRegionChart(regionMap) {
+            const isGMV = regionMetric === 'gmv';
+            const field = regionMetric;
+            const entries = Object.entries(regionMap)
+                .map(([name, v]) => [name, v[field]])
+                .sort((a, b) => b[1] - a[1]);
             if (!chartRegion) chartRegion = echarts.init(document.getElementById('chartRegion'));
             chartRegion.setOption({
-                tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+                tooltip: {
+                    trigger: 'axis', axisPointer: { type: 'shadow' },
+                    formatter: function(params) {
+                        const v = regionMap[params[0].name];
+                        return params[0].name + '<br/>订单数: ' + v.order_count + '<br/>实付GMV: ' + fmtGMV(v.gmv);
+                    }
+                },
                 grid: { left: '3%', right: '4%', bottom: '10%', top: '6%', containLabel: true },
                 xAxis: {
                     type: 'category',
-                    data: regionEntries.map(e => e[0]),
+                    data: entries.map(e => e[0]),
                     axisLabel: { rotate: 25, fontSize: 11, color: '#888888' },
                     axisLine: { lineStyle: { color: '#E8E8E8' } },
                     axisTick: { show: false }
                 },
                 yAxis: {
                     type: 'value',
-                    axisLabel: { color: '#BBBBBB', fontSize: 11 },
+                    axisLabel: { color: '#BBBBBB', fontSize: 11,
+                        formatter: isGMV ? function(v) { return fmtGMVShort(v); } : '' },
                     splitLine: { lineStyle: { color: '#F5F5F5' } },
                     axisLine: { show: false }
                 },
                 series: [{
                     type: 'bar',
-                    data: regionEntries.map(e => e[1]),
+                    data: entries.map(e => isGMV ? parseFloat(e[1].toFixed(2)) : e[1]),
                     itemStyle: { color: '#1A365D' },
-                    label: { show: true, position: 'top', fontSize: 11, color: '#888888' },
+                    label: { show: true, position: 'top', fontSize: 11, color: '#888888',
+                        formatter: function(p) { return isGMV ? fmtGMV(p.value) : p.value; }
+                    },
                     barMaxWidth: 36
                 }]
             }, true);
+        }
 
-            // --- 异常原因：横向柱状图 ---
-            const reasonMap = {};
-            data.forEach(row => {
-                const r = row['异常原因分类'] || '未知';
-                reasonMap[r] = (reasonMap[r] || 0) + 1;
-            });
-            const reasonEntries = Object.entries(reasonMap).sort((a, b) => a[1] - b[1]);
+        // 异常原因横向柱状图
+        function renderReasonChart(reasonMap) {
+            const isGMV = reasonMetric === 'gmv';
+            const field = reasonMetric;
+            const entries = Object.entries(reasonMap)
+                .map(([name, v]) => [name, v[field]])
+                .sort((a, b) => a[1] - b[1]);
             if (!chartReason) chartReason = echarts.init(document.getElementById('chartReason'));
             chartReason.setOption({
-                tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-                grid: { left: '3%', right: '12%', bottom: '3%', top: '3%', containLabel: true },
+                tooltip: {
+                    trigger: 'axis', axisPointer: { type: 'shadow' },
+                    formatter: function(params) {
+                        const v = reasonMap[params[0].name];
+                        return params[0].name + '<br/>订单数: ' + v.order_count + '<br/>实付GMV: ' + fmtGMV(v.gmv);
+                    }
+                },
+                grid: { left: '3%', right: '14%', bottom: '3%', top: '3%', containLabel: true },
                 xAxis: {
                     type: 'value',
-                    axisLabel: { color: '#BBBBBB', fontSize: 11 },
+                    axisLabel: { color: '#BBBBBB', fontSize: 11,
+                        formatter: isGMV ? function(v) { return fmtGMVShort(v); } : '' },
                     splitLine: { lineStyle: { color: '#F5F5F5' } },
                     axisLine: { show: false }
                 },
                 yAxis: {
                     type: 'category',
-                    data: reasonEntries.map(e => e[0]),
+                    data: entries.map(e => e[0]),
                     axisLabel: { color: '#888888', fontSize: 11, width: 80, overflow: 'truncate' },
                     axisLine: { lineStyle: { color: '#E8E8E8' } },
                     axisTick: { show: false }
                 },
                 series: [{
                     type: 'bar',
-                    data: reasonEntries.map(e => e[1]),
+                    data: entries.map(e => isGMV ? parseFloat(e[1].toFixed(2)) : e[1]),
                     itemStyle: { color: '#C4A35A' },
-                    label: { show: true, position: 'right', fontSize: 11, color: '#888888' },
+                    label: { show: true, position: 'right', fontSize: 11, color: '#888888',
+                        formatter: function(p) { return isGMV ? fmtGMV(p.value) : p.value; }
+                    },
                     barMaxWidth: 22
                 }]
             }, true);
+        }
 
-            // --- 业绩归属：环形图 ---
-            const ownershipMap = {};
-            data.forEach(row => {
-                const o = row['业绩归属'] || '未知';
-                ownershipMap[o] = (ownershipMap[o] || 0) + 1;
-            });
-            const ownershipData = Object.entries(ownershipMap).map(([name, value]) => ({ name, value }));
+        // 业绩归属环形图
+        function renderOwnershipChart(ownershipMap) {
+            const isGMV = ownershipMetric === 'gmv';
+            const field = ownershipMetric;
+            const entries = Object.entries(ownershipMap)
+                .map(([name, v]) => ({ name, value: isGMV ? parseFloat(v[field].toFixed(2)) : v[field], raw: v }))
+                .sort((a, b) => b.value - a.value);
             if (!chartOwnership) chartOwnership = echarts.init(document.getElementById('chartOwnership'));
             chartOwnership.setOption({
-                tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: function(p) {
+                        const v = p.data.raw;
+                        return p.name + '<br/>订单数: ' + v.order_count + '<br/>实付GMV: ' + fmtGMV(v.gmv) + ' (' + p.percent + '%)';
+                    }
+                },
                 legend: {
-                    type: 'scroll',
-                    bottom: 0,
-                    left: 'center',
-                    fontSize: 11,
-                    textStyle: { color: '#888888' },
-                    itemWidth: 8,
-                    itemHeight: 8,
-                    itemGap: 12
+                    type: 'scroll', bottom: 0, left: 'center', fontSize: 11,
+                    textStyle: { color: '#888888' }, itemWidth: 8, itemHeight: 8, itemGap: 12
                 },
                 series: [{
                     type: 'pie',
                     radius: ['45%', '65%'],
                     center: ['50%', '42%'],
-                    data: ownershipData,
+                    data: entries,
                     label: { show: true, fontSize: 11, color: '#1A1A1A', formatter: '{b}\n{d}%' },
                     labelLine: { length: 8, length2: 8 },
                     itemStyle: { borderColor: '#fff', borderWidth: 2 },
                     color: CHART_COLORS
                 }]
             }, true);
+        }
+
+        // 统一图表指标切换
+        function switchChartMetric(chartName, metric, btn) {
+            if (chartName === 'region') regionMetric = metric;
+            else if (chartName === 'reason') reasonMetric = metric;
+            else if (chartName === 'ownership') ownershipMetric = metric;
+            // 更新同组按钮状态
+            const toggle = btn.parentElement;
+            toggle.querySelectorAll('.metric-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            // 用当前筛选数据重绘对应图表
+            if (!filteredData) return;
+            const accGmv = (row) => parseFloat(row['实付GMV']) || 0;
+            const fieldMap = { region: '大区', reason: '异常原因分类', ownership: '业绩归属' };
+            const defaultVal = { region: '公海', reason: '未知', ownership: '未知' };
+            const renderMap = { region: renderRegionChart, reason: renderReasonChart, ownership: renderOwnershipChart };
+            const m = {};
+            filteredData.forEach(row => {
+                const key = row[fieldMap[chartName]] || defaultVal[chartName];
+                if (!m[key]) m[key] = { order_count: 0, gmv: 0 };
+                m[key].order_count += 1;
+                m[key].gmv += accGmv(row);
+            });
+            renderMap[chartName](m);
         }
 
         function switchTab(tab, btn) {

@@ -34,6 +34,13 @@ def connect_mailbox(config):
     account = os.environ.get("EMAIL_ACCOUNT", email_config["email_account"])
     password = os.environ.get("EMAIL_PASSWORD", email_config["email_password"])
 
+    if not password:
+        print("[邮件读取] 错误：未配置邮箱授权码！")
+        print("[邮件读取] 请检查：")
+        print("  1. 本地开发：复制 .env.example 为 .env 并填写 EMAIL_PASSWORD")
+        print("  2. GitHub Actions：确认已设置 EMAIL_PASSWORD secret")
+        raise ValueError("EMAIL_PASSWORD 未配置，无法连接邮箱")
+
     print(f"[邮件读取] 正在连接 {server}:{port} ...")
     mail = imaplib.IMAP4_SSL(server, port)
     # 设置 UTF-8 编码，支持中文搜索

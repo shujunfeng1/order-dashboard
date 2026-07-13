@@ -1,8 +1,8 @@
 {
   "email": {
-    "imap_server": "",
+    "imap_server": "mail.ybm100.com",
     "imap_port": 993,
-    "email_account": "",
+    "email_account": "shujunfeng@ybm100.com",
     "email_password": "",
     "sender_filter": "",
     "subject_filter": "【卡单】【数据】",
@@ -23,17 +23,45 @@
       "大区": "T"
     },
     "blank_replacement": "公海",
-    "blank_fields": ["大区", "客户省份", "下单BD组别"]
+    "blank_fields": [
+      "大区",
+      "客户省份",
+      "下单BD组别"
+    ]
   },
   "dashboard": {
-    "grouping_fields": ["大区", "客户省份", "下单BD组别"],
+    "grouping_fields": [
+      "大区",
+      "客户省份",
+      "下单BD组别"
+    ],
     "metrics": {
-      "客户数": {"column": "客户ID", "agg": "nunique"},
-      "卡单订单数": {"column": "订单编号", "agg": "count"},
-      "涉及销售数": {"column": "下单BD工号", "agg": "nunique"},
-      "涉及实付GMV": {"column": "实付GMV", "agg": "sum"}
+      "客户数": {
+        "column": "客户ID",
+        "agg": "nunique"
+      },
+      "卡单订单数": {
+        "column": "订单编号",
+        "agg": "count"
+      },
+      "涉及销售数": {
+        "column": "下单BD工号",
+        "agg": "nunique"
+      },
+      "涉及实付GMV": {
+        "column": "实付GMV",
+        "agg": "sum"
+      }
     },
-    "filter_fields": ["大区", "业绩归属", "异常原因分类"],
-    "chart_fields": ["大区", "异常原因分类", "业绩归属"]
+    "filter_fields": [
+      "大区",
+      "业绩归属",
+      "异常原因分类"
+    ],
+    "chart_fields": [
+      "大区",
+      "异常原因分类",
+      "业绩归属"
+    ]
   }
 }

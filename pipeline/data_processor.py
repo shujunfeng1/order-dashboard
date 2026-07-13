@@ -65,12 +65,19 @@ def process_data(df, config):
             "values": region_agg["卡单订单数"].tolist(),
         }
 
-    # 异常原因分类（饼图）
+    # 异常原因分类（横向柱状图，同时含订单数和GMV两个维度）
     if "异常原因分类" in df.columns:
-        reason_counts = df["异常原因分类"].value_counts()
+        reason_agg = df.groupby("异常原因分类").agg(
+            order_count=("订单编号", "count"),
+            gmv=("实付GMV", "sum") if "实付GMV" in df.columns else ("订单编号", "count"),
+        ).reset_index().sort_values("order_count", ascending=False)
         charts["reason"] = [
-            {"name": str(name), "value": int(count)}
-            for name, count in reason_counts.items()
+            {
+                "name": str(row["异常原因分类"]),
+                "order_count": int(row["order_count"]),
+                "gmv": round(float(row["gmv"]), 2),
+            }
+            for _, row in reason_agg.iterrows()
         ]
 
     # 业绩归属分布（饼图）
