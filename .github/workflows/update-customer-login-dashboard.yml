@@ -1,0 +1,71 @@
+name: 更新客户登录转化看板数据
+
+on:
+  schedule:
+    # 北京时间 10:50 / 13:20 / 16:45
+    - cron: '50 2 * * *'
+    - cron: '20 5 * * *'
+    - cron: '45 8 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: update-customer-login-dashboard
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 安装依赖
+        run: pip install -r requirements.txt
+
+      - name: 获取邮件并生成登录看板数据
+        env:
+          IMAP_SERVER: ${{ secrets.IMAP_SERVER }}
+          IMAP_PORT: ${{ secrets.IMAP_PORT }}
+          EMAIL_ACCOUNT: ${{ secrets.EMAIL_ACCOUNT }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+        shell: bash
+        run: |
+          for attempt in 1 2 3; do
+            echo "第 ${attempt} 次获取邮件"
+            if python pipeline/run_customer_login_pipeline.py \
+              --require-current-slot \
+              --output docs/customer_login_data.json; then
+              exit 0
+            fi
+            if [ "${attempt}" -lt 3 ]; then
+              echo "目标时段邮件尚未到达，60 秒后重试"
+              sleep 60
+            fi
+          done
+          exit 1
+
+      - name: 校验输出数据
+        run: |
+          python -c "import json; d=json.load(open('docs/customer_login_data.json', encoding='utf-8')); assert d['unique_customers'] > 0; assert d['rows']; print(d['data_date'], d['data_time'], d['unique_customers'])"
+
+      - name: 提交更新数据
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/customer_login_data.json
+          if git diff --staged --quiet; then
+            echo "登录看板数据未变化，跳过提交"
+          else
+            git commit -m "自动更新登录看板数据 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')"
+            git push
+          fi

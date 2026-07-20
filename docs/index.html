@@ -53,6 +53,10 @@
             letter-spacing: 0.08em;
         }
         .header-right { display: flex; gap: 8px; align-items: center; }
+        .dashboard-nav { display: flex; border: 1px solid rgba(255,255,255,0.25); margin-right: 6px; }
+        .dashboard-nav a, .dashboard-nav span { padding: 7px 12px; color: rgba(255,255,255,0.76); font-size: 12px; text-decoration: none; white-space: nowrap; line-height: 1; }
+        .dashboard-nav a:hover { color: var(--white); background: rgba(255,255,255,0.08); }
+        .dashboard-nav .active { background: var(--white); color: var(--dark-blue); font-weight: 500; }
         .update-time {
             font-size: 11px;
             color: rgba(255,255,255,0.45);
@@ -342,6 +346,7 @@
             .header-left h1 { font-size: 16px; }
             .header-left .subtitle { font-size: 11px; }
             .header-right { width: 100%; justify-content: flex-start; }
+            .dashboard-nav { margin-right: 0; }
             .update-time { display: none; }
             .btn-action { padding: 6px 12px; font-size: 11px; }
             .container { padding: 16px 16px 48px; }
@@ -387,6 +392,7 @@
             <div class="subtitle" id="subTitle">数据加载中...</div>
         </div>
         <div class="header-right">
+            <nav class="dashboard-nav" aria-label="看板切换"><span class="active">卡单数据看板</span><a href="./customer-login-dashboard.html">登录转化看板</a></nav>
             <span class="update-time" id="updateTime">--</span>
             <button class="btn-action" onclick="downloadExcel()">下载明细</button>
             <button class="btn-action" onclick="window.print()">导出看板</button>
