@@ -180,24 +180,26 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 8px;
             margin-bottom: 16px;
             padding-bottom: 12px;
             border-bottom: 1px solid var(--faint-gray);
         }
-        .chart-title-bar .chart-title { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
-        .metric-toggle { display: flex; gap: 0; }
+        .chart-title-bar .chart-title { margin-bottom: 0; padding-bottom: 0; border-bottom: none; white-space: nowrap; }
+        .metric-toggle { display: flex; gap: 0; flex-shrink: 0; }
         .metric-btn {
             background: transparent;
             color: var(--gray);
             border: 1px solid var(--border);
-            padding: 4px 12px;
+            padding: 4px 8px;
             cursor: pointer;
             font-size: 11px;
             font-family: var(--body-font);
-            letter-spacing: 0.06em;
+            letter-spacing: 0;
+            white-space: nowrap;
             transition: all 0.2s;
         }
-        .metric-btn:first-child { border-right: none; }
+        .metric-btn + .metric-btn { border-left: none; }
         .metric-btn.active { color: var(--white); background: var(--dark-blue); border-color: var(--dark-blue); }
         .metric-btn:hover:not(.active) { color: var(--dark-blue); }
         .chart-container { width: 100%; height: 260px; }
@@ -434,6 +436,7 @@
                     <span class="chart-title">大区卡单分布</span>
                     <div class="metric-toggle">
                         <button class="metric-btn active" onclick="switchChartMetric('region','order_count',this)">订单数</button>
+                        <button class="metric-btn" onclick="switchChartMetric('region','customer_count',this)">去重客户数</button>
                         <button class="metric-btn" onclick="switchChartMetric('region','gmv',this)">实付GMV</button>
                     </div>
                 </div>
@@ -444,6 +447,7 @@
                     <span class="chart-title">异常原因分类</span>
                     <div class="metric-toggle">
                         <button class="metric-btn active" onclick="switchChartMetric('reason','order_count',this)">订单数</button>
+                        <button class="metric-btn" onclick="switchChartMetric('reason','customer_count',this)">去重客户数</button>
                         <button class="metric-btn" onclick="switchChartMetric('reason','gmv',this)">实付GMV</button>
                     </div>
                 </div>
@@ -454,6 +458,7 @@
                     <span class="chart-title">业绩归属分布</span>
                     <div class="metric-toggle">
                         <button class="metric-btn active" onclick="switchChartMetric('ownership','order_count',this)">订单数</button>
+                        <button class="metric-btn" onclick="switchChartMetric('ownership','customer_count',this)">去重客户数</button>
                         <button class="metric-btn" onclick="switchChartMetric('ownership','gmv',this)">实付GMV</button>
                     </div>
                 </div>
@@ -639,32 +644,27 @@
 
         let chartRegion, chartReason, chartOwnership;
 
-        function updateCharts(data) {
-            // 聚合三个图的维度数据（同时算 order_count + gmv）
-            const regionMap = {};
-            const reasonMap = {};
-            const ownershipMap = {};
+        function aggregateChartData(data, field, defaultValue) {
+            const result = {};
             data.forEach(row => {
+                const key = row[field] || defaultValue;
                 const gmv = parseFloat(row['实付GMV']) || 0;
-                // 大区
-                const r = row['大区'] || '公海';
-                if (!regionMap[r]) regionMap[r] = { order_count: 0, gmv: 0 };
-                regionMap[r].order_count += 1;
-                regionMap[r].gmv += gmv;
-                // 异常原因
-                const reason = row['异常原因分类'] || '未知';
-                if (!reasonMap[reason]) reasonMap[reason] = { order_count: 0, gmv: 0 };
-                reasonMap[reason].order_count += 1;
-                reasonMap[reason].gmv += gmv;
-                // 业绩归属
-                const own = row['业绩归属'] || '未知';
-                if (!ownershipMap[own]) ownershipMap[own] = { order_count: 0, gmv: 0 };
-                ownershipMap[own].order_count += 1;
-                ownershipMap[own].gmv += gmv;
+                if (!result[key]) result[key] = { order_count: 0, customer_count: 0, gmv: 0, customer_ids: new Set() };
+                result[key].order_count += 1;
+                result[key].gmv += gmv;
+                if (row['客户ID']) result[key].customer_ids.add(row['客户ID']);
             });
-            renderRegionChart(regionMap);
-            renderReasonChart(reasonMap);
-            renderOwnershipChart(ownershipMap);
+            Object.values(result).forEach(item => {
+                item.customer_count = item.customer_ids.size;
+                delete item.customer_ids;
+            });
+            return result;
+        }
+
+        function updateCharts(data) {
+            renderRegionChart(aggregateChartData(data, '大区', '公海'));
+            renderReasonChart(aggregateChartData(data, '异常原因分类', '未知'));
+            renderOwnershipChart(aggregateChartData(data, '业绩归属', '未知'));
         }
 
         // GMV 格式化辅助
@@ -688,7 +688,7 @@
                     trigger: 'axis', axisPointer: { type: 'shadow' },
                     formatter: function(params) {
                         const v = regionMap[params[0].name];
-                        return params[0].name + '<br/>订单数: ' + v.order_count + '<br/>实付GMV: ' + fmtGMV(v.gmv);
+                        return params[0].name + '<br/>订单数: ' + v.order_count + '<br/>去重客户数: ' + v.customer_count + '<br/>实付GMV: ' + fmtGMV(v.gmv);
                     }
                 },
                 grid: { left: '3%', right: '4%', bottom: '10%', top: '6%', containLabel: true },
@@ -731,7 +731,7 @@
                     trigger: 'axis', axisPointer: { type: 'shadow' },
                     formatter: function(params) {
                         const v = reasonMap[params[0].name];
-                        return params[0].name + '<br/>订单数: ' + v.order_count + '<br/>实付GMV: ' + fmtGMV(v.gmv);
+                        return params[0].name + '<br/>订单数: ' + v.order_count + '<br/>去重客户数: ' + v.customer_count + '<br/>实付GMV: ' + fmtGMV(v.gmv);
                     }
                 },
                 grid: { left: '3%', right: '14%', bottom: '3%', top: '3%', containLabel: true },
@@ -774,7 +774,7 @@
                     trigger: 'item',
                     formatter: function(p) {
                         const v = p.data.raw;
-                        return p.name + '<br/>订单数: ' + v.order_count + '<br/>实付GMV: ' + fmtGMV(v.gmv) + ' (' + p.percent + '%)';
+                        return p.name + '<br/>订单数: ' + v.order_count + '<br/>去重客户数: ' + v.customer_count + '<br/>实付GMV: ' + fmtGMV(v.gmv) + ' (' + p.percent + '%)';
                     }
                 },
                 legend: {
@@ -805,18 +805,10 @@
             btn.classList.add('active');
             // 用当前筛选数据重绘对应图表
             if (!filteredData) return;
-            const accGmv = (row) => parseFloat(row['实付GMV']) || 0;
             const fieldMap = { region: '大区', reason: '异常原因分类', ownership: '业绩归属' };
             const defaultVal = { region: '公海', reason: '未知', ownership: '未知' };
             const renderMap = { region: renderRegionChart, reason: renderReasonChart, ownership: renderOwnershipChart };
-            const m = {};
-            filteredData.forEach(row => {
-                const key = row[fieldMap[chartName]] || defaultVal[chartName];
-                if (!m[key]) m[key] = { order_count: 0, gmv: 0 };
-                m[key].order_count += 1;
-                m[key].gmv += accGmv(row);
-            });
-            renderMap[chartName](m);
+            renderMap[chartName](aggregateChartData(filteredData, fieldMap[chartName], defaultVal[chartName]));
         }
 
         function switchTab(tab, btn) {
