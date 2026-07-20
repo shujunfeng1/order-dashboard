@@ -1,0 +1,15 @@
+{
+  "email": {
+    "imap_server": "mail.ybm100.com",
+    "imap_port": 993,
+    "email_account": "shujunfeng@ybm100.com",
+    "sender_filter": "hm.lu@ybm100.com",
+    "subject_prefix": "【今日登录客户明细】",
+    "attachment_prefix": "今日登录客户明细_",
+    "lookback_days": 2,
+    "report_slots": ["10:45", "13:15", "16:40"]
+  },
+  "excel": {
+    "sheet_name": "今日登录客户明细"
+  }
+}

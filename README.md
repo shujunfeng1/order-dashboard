@@ -1,368 +1,167 @@
-# 卡单数据看板
+# 在线业务数据看板
 
-每日自动从企业邮箱读取带 Excel 附件的邮件，解析数据后生成可视化看板，部署为公网可访问的网页，支持筛选、下载明细。电脑关机也能自动更新。
+通过企业邮箱自动获取Excel附件，生成可公开访问的静态业务看板。项目由GitHub Actions运行，不依赖个人电脑开机。
 
----
+## 线上看板
 
-## 项目背景
+| 看板 | 地址 | 更新频率 |
+|---|---|---|
+| 卡单数据看板 | https://shujunfeng1.github.io/order-dashboard/ | 每日9:30、10:00（北京时间） |
+| 客户登录、拜访及转化看板 | https://shujunfeng1.github.io/order-dashboard/customer-login-dashboard.html | 每日10:50、13:20、16:45（北京时间） |
 
-业务团队每天早上会收到一封包含卡单（异常订单）数据的 Excel 附件邮件。之前需要人工下载附件、用 Excel 做透视表、截图发群，效率低且容易遗漏。
+两个页面顶部均提供看板切换入口，筛选、指标、图表和明细表保持一致的操作体验。
 
-本项目将整个流程自动化：定时读取邮件 → 解析 Excel → 生成数据看板 → 自动更新网页，团队成员直接打开链接即可查看最新数据。
+## 项目能力
 
----
+- 通过IMAP SSL连接企业邮箱并下载指定Excel附件。
+- 自动识别当天最新邮件，解析中文主题和附件名称。
+- GitHub Actions按北京时间定时运行，电脑关机不影响更新。
+- 自动清洗空值、按客户ID去重、聚合并生成静态JSON。
+- GitHub Pages托管页面，数据更新后自动发布。
+- 支持手动触发工作流和本地Excel回归验证。
 
-## 线上地址
+## 数据链路
 
-| 环境 | 地址 | 说明 |
-|------|------|------|
-| **GitHub Pages（主）** | https://shujunfeng1.github.io/order-dashboard/ | 永久链接，电脑关机也能自动更新 |
-| 本地开发 | http://localhost:5000 | Flask 开发服务器 |
+~~~text
+企业邮箱
+  ├─ 卡单邮件 → pipeline/run_pipeline.py
+  │              └─ docs/dashboard_data.json + 可下载卡单明细
+  └─ 今日登录客户明细 → pipeline/run_customer_login_pipeline.py
+                         └─ docs/customer_login_data.json（仅聚合数据）
+                                      ↓
+                              GitHub Pages 双看板
+~~~
 
----
+登录客户附件包含客户ID、客户名称等业务信息。该附件只在GitHub Actions临时目录中处理，处理结束后自动销毁，仓库和GitHub Pages不会保存或公开原始客户明细。
 
-## 技术方案
+## 邮件规则
 
-### 整体架构
+### 卡单数据
 
-```
-企业邮箱 (IMAP)
-    │
-    │  每日 9:30 / 10:00 自动触发
-    ▼
-GitHub Actions (Ubuntu Runner)
-    │
-    ├── 1. 连接邮箱 (imaplib, SSL, UTF-8)
-    ├── 2. 搜索主题含「【卡单】【数据】」的当天邮件
-    ├── 3. 下载 .xlsx 附件
-    ├── 4. pandas 解析 + 字段映射 + 空白填充
-    ├── 5. 聚合计算 (KPI + 图表 + 聚合表 + 明细)
-    ├── 6. 输出 JSON + Excel 到 docs/
-    └── 7. git commit & push → GitHub Pages 自动更新
-```
+配置位于 config/settings.json，当前按主题关键词获取卡单Excel附件。
 
-### 技术栈
+### 客户登录、拜访及转化数据
 
-| 模块 | 技术 | 说明 |
-|------|------|------|
-| 邮件读取 | Python `imaplib` + `email` | IMAP SSL，支持中文主题搜索 |
-| Excel 解析 | `pandas` + `openpyxl` | 读取 .xlsx，字段映射，数据清洗 |
-| 数据处理 | `pandas` | 多维聚合，去重计数，GMV 求和 |
-| 看板前端 | HTML + ECharts 5.5 (CDN) | 纯静态，无框架依赖 |
-| 字体 | Noto Serif SC (Google Fonts) | 衬线体标题，商务风格 |
-| 定时调度 | GitHub Actions (cron) | UTC 时区，北京时间 +8 |
-| 网页托管 | GitHub Pages | 从 docs/ 目录自动部署 |
-| 本地开发 | Flask | 开发调试用，非生产 |
+配置位于 config/customer_login_settings.json：
 
-### 项目结构
+- 发件人：hm.lu@ybm100.com
+- 主题格式：【今日登录客户明细】YYYY-MM-DD-HH-MM
+- 附件格式：今日登录客户明细_YYYY-MM-DD-HH-MM.xlsx
+- 报表时间：10:45、13:15、16:40
+- 获取时间：10:50、13:20、16:45
 
-```
-order-dashboard/
-├── .env.example                     # 凭据模板（复制为 .env 使用）
-├── .gitignore                       # 排除 .env、运行时数据
-├── requirements.txt                 # Python 依赖（含 python-dotenv）
-├── run_all.py                       # 一键执行：管道 + Flask
-├── sync_to_github.py                # 同步脚本：根目录 -> github/
-├── config/
-│   └── settings.json                # 字段映射、看板配置（不含密码）
-├── pipeline/                        # 数据管道（主代码）
-│   ├── email_reader.py              #   IMAP 邮件读取 + 附件下载
-│   ├── excel_parser.py              #   Excel 解析 + 字段映射 + 清洗
-│   ├── data_processor.py            #   聚合计算 + JSON 生成
-│   └── run_pipeline.py              #   管道主入口
-├── web/                             # Flask 本地开发
-│   ├── app.py                       #   Flask 服务
-│   ├── static/dashboard.html        #   静态看板主文件（GitHub Pages 源）
-│   ├── templates/dashboard.html     #   Flask 版看板模板
-│   └── static/                      #   本地数据文件
-├── skill/                           # 可复用技能包
-│   └── ...
-└── github/                          # 远程仓库源（由 sync_to_github.py 同步）
-    ├── .github/workflows/update-dashboard.yml
-    ├── config/settings.json         #   脱敏版
-    ├── docs/                        #   GitHub Pages 根目录
-    │   ├── index.html               #   由 sync 生成
-    │   └── dashboard_data.json
-    ├── pipeline/                    #   由 sync 同步
-    └── requirements.txt
-```
+程序先按发件人与日期范围检索，再在本地解码中文主题，避免部分IMAP服务器对中文SUBJECT搜索支持不稳定。每个更新时段会校验对应报表是否已经到达；若邮件延迟，工作流会间隔60秒重试，仍未到达则明确失败并保留上一版线上数据。
 
-> **同步机制**：根目录为开发主目录，改完代码后运行 `python sync_to_github.py` 一键同步到 `github/`，再从 `github/` 推送到远程仓库。
+## 登录看板指标口径
 
----
+- 登录客户数：按客户ID去重。
+- 拜访客户数：是否拜访、是否上门拜访、是否电话拜访任一为“是”。
+- 加购客户数：去重客户中是否加购为“是”。
+- 下单客户数：去重客户中是否下单为“是”。
+- 拜访覆盖率：拜访客户数 / 登录客户数。
+- 下单转化率：下单客户数 / 登录客户数。
+- 业态：客户类型为“连锁”或“批发”时归入“连锁”，单体和诊所归入“单体”。
+- 空白大区：统一归入“公海”。
+- 重复客户：同一客户多行记录按行为字段取“或”，大区、省份和业态取最后一条记录。
 
-## 数据字段说明
+## 项目结构
 
-### Excel 原始字段映射
+~~~text
+.github/workflows/
+  update-dashboard.yml                 卡单看板定时更新
+  update-customer-login-dashboard.yml  登录看板每日三次更新
+config/
+  settings.json                        卡单配置
+  customer_login_settings.json         登录看板邮件与Sheet配置
+pipeline/
+  email_reader.py                      卡单邮件读取
+  run_pipeline.py                      卡单数据管道
+  customer_login_email.py              登录邮件检索与附件下载
+  customer_login_processor.py          登录数据去重与聚合
+  run_customer_login_pipeline.py       登录看板管道入口
+docs/
+  index.html                           卡单数据看板
+  dashboard_data.json                  卡单看板数据
+  customer-login-dashboard.html        登录、拜访及转化看板
+  customer_login_data.json             登录看板聚合数据
+tests/
+  test_customer_login_pipeline.py      登录管道单元测试
+~~~
 
-数据来源：邮件附件 Excel，Sheet 名「累计卡单」，约 850 条/天。
+## GitHub Secrets
 
-| 看板字段 | Excel 列 | 列名 | 取值逻辑 | 备注 |
-|---------|---------|------|---------|------|
-| 大区 | T 列 | `大区` | 直接取值，空白→"公海" | 约 15 条空白 |
-| 省区 | D 列 | `客户省份` | 直接取值，空白→"公海" | 当前无空白 |
-| 组别 | S 列 | `下单BD组别` | 直接取值，空白→"公海" | 约 15 条空白 |
-| 客户数 | A 列 | `客户ID` | 按分组**去重计数** | 全局约 797 |
-| 卡单订单数 | E 列 | `订单编号` | **计数**（非去重） | 全局 850，无重复 |
-| 涉及销售数 | Q 列 | `下单BD工号` | 按分组**去重计数** | 全局约 434 |
-| 涉及实付GMV | G 列 | `实付GMV` | **求和**，保留 2 位小数 | 全局约 ¥102 万 |
-| 业绩归属 | O 列 | `业绩归属` | 直接取值，用于筛选和饼图 | POP / 自营 / 控销 |
-| 异常原因分类 | N 列 | `异常原因分类` | 直接取值，用于筛选和柱状图 | 客户异常/资质过期 等 |
+仓库Settings → Secrets and variables → Actions中需要配置：
 
-### KPI 卡片
+| Secret | 说明 |
+|---|---|
+| IMAP_SERVER | 企业邮箱服务器 |
+| IMAP_PORT | IMAP SSL端口，通常为993 |
+| EMAIL_ACCOUNT | 邮箱账号 |
+| EMAIL_PASSWORD | IMAP授权码，不是网页登录密码 |
 
-| KPI | 计算方式 |
-|-----|---------|
-| 卡单订单数 | `len(df)` 或 `订单编号.count()` |
-| 客户数 | `客户ID.nunique()` |
-| 涉及销售数 | `下单BD工号.nunique()` |
-| 涉及实付GMV | `实付GMV.sum()`，保留 2 位小数 |
+授权码不得写入JSON、Python、README、日志或Git提交。
 
-### 聚合表
+## GitHub Actions时间
 
-按 `大区 → 客户省份 → 下单BD组别` 三级分组，每组计算：
-- 客户数（去重）
-- 卡单订单数（计数）
-- 涉及销售数（去重）
-- 涉及实付GMV（求和）
+GitHub Actions cron使用UTC时区：
 
-### 筛选器联动
+| 工作流 | 北京时间 | UTC cron |
+|---|---|---|
+| 卡单看板 | 09:30 | 30 1 * * * |
+| 卡单看板 | 10:00 | 0 2 * * * |
+| 登录看板 | 10:50 | 50 2 * * * |
+| 登录看板 | 13:20 | 20 5 * * * |
+| 登录看板 | 16:45 | 45 8 * * * |
 
-三个筛选器（大区 / 业绩归属 / 异常原因分类）选择后，KPI 卡片、图表、聚合表、明细表全部同步刷新。筛选在前端 JS 完成，无需请求后端。
+GitHub定时任务可能有数分钟排队延迟，页面显示的是邮件主题中的报表时间，不是Actions启动时间。
 
----
+## 本地验证
 
-## 看板设计
+安装依赖：
 
-### 页面布局
-
-```
-┌─────────────────────────────────────────────────┐
-│  Header: 卡单数据看板 | 更新时间 | 下载明细 | 导出  │
-├──────────┬──────────┬──────────┬─────────────────┤
-│ 卡单订单数 │  客户数   │ 涉及销售数 │  涉及实付GMV    │
-├──────────┴──────────┴──────────┴─────────────────┤
-│  筛选器: 大区 | 业绩归属 | 异常原因 | 重置          │
-├──────────────┬──────────────┬────────────────────┤
-│ 大区卡单分布   │ 异常原因分类   │   业绩归属分布      │
-│ (柱状图)      │ (横向柱状图)   │   (环形图)         │
-├──────────────┴──────────────┴────────────────────┤
-│  Tab: 聚合表 | 明细数据                           │
-│  ┌────────────────────────────────────────────┐  │
-│  │  数据表格（排序、分页、搜索）                  │  │
-│  └────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────┘
-```
-
-### 设计规范
-
-- **配色**：白底 + 深蓝 `#1A365D` + 金色 `#C4A35A` + 橙色 `#C04A1A`
-- **字体**：标题和数字用 Noto Serif SC（衬线体），正文用系统无衬线字体
-- **布局**：细线分隔代替阴影，无圆角，编辑风格
-- **表格**：深蓝表头白字、隔行浅灰 `#F5F5F5`、首列衬线体深蓝色
-- **图表**：深蓝柱状图、金色横向柱状图、环形图配底部图例
-- **响应式**：1024px 以下平板适配，640px 以下手机适配
-
----
-
-## 邮箱配置
-
-### IMAP 连接参数
-
-| 参数 | 值 |
-|------|------|
-| IMAP 服务器 | `mail.ybm100.com` |
-| 端口 | 993 (SSL) |
-| 账号 | `shujunfeng@ybm100.com` |
-| 认证方式 | IMAP 授权码（非登录密码） |
-| 主题关键词 | `【卡单】【数据】` |
-| 附件关键词 | `.xlsx` |
-| 邮件到达时间 | 每日约 09:03 |
-
-### GitHub Secrets 配置
-
-在仓库 Settings → Secrets and variables → Actions 中设置：
-
-| Secret 名称 | 值 |
-|-------------|------|
-| `IMAP_SERVER` | mail.ybm100.com |
-| `IMAP_PORT` | 993 |
-| `EMAIL_ACCOUNT` | shujunfeng@ybm100.com |
-| `EMAIL_PASSWORD` | IMAP 授权码 |
-
-> **注意**：本地开发时，凭据写在 `config/settings.json` 中（已加入 .gitignore 不上传）。GitHub Actions 中通过环境变量注入，代码会优先读取环境变量。
-
----
-
-## GitHub Actions 工作流
-
-### 触发时间
-
-| 触发时间（北京时间） | Cron (UTC) | 说明 |
-|---------------------|------------|------|
-| 09:30 | `30 1 * * *` | 首次尝试 |
-| 10:00 | `0 2 * * *` | 兜底（9:30 邮件未到时补跑） |
-
-### 工作流步骤
-
-1. 检出代码 (`actions/checkout@v4`)
-2. 设置 Python 3.11 (`actions/setup-python@v5`)
-3. 安装依赖 (`pip install -r requirements.txt`)
-4. 执行数据管道（环境变量注入邮箱凭据）
-5. 提交更新的 JSON 和 Excel 文件（`git commit & push`）
-
-### 手动触发
-
-在 GitHub 仓库 → Actions → "更新卡单看板数据" → Run workflow 可手动触发。
-
-### 查看运行日志
-
-```
-gh run list --workflow=update-dashboard.yml
-gh run view <run-id>
-```
-
----
-
-## 本地开发
-
-### 环境要求
-
-- Python 3.11+
-- pip
-
-### 安装依赖
-
-```bash
+~~~bash
 pip install -r requirements.txt
-```
+~~~
 
-### 配置邮箱凭据
+使用本地附件生成登录看板数据：
 
-```bash
-cp .env.example .env
-# 编辑 .env，填入真实的 IMAP 授权码
-```
+~~~bash
+python pipeline/run_customer_login_pipeline.py "path/to/今日登录客户明细.xlsx" --output web/static/customer_login_data.json
+~~~
 
-> `.env` 已在 `.gitignore` 中排除，不会提交到 Git。GitHub Actions 通过 Secrets 注入。
+使用IMAP读取真实邮件时，通过环境变量设置IMAP_SERVER、IMAP_PORT、EMAIL_ACCOUNT、EMAIL_PASSWORD，然后执行：
 
-### 本地运行管道（使用本地 Excel 文件）
+~~~bash
+python pipeline/run_customer_login_pipeline.py --require-current-slot
+~~~
 
-```bash
-cd order-dashboard
-python pipeline/run_pipeline.py "path/to/excel.xlsx"
-```
+运行测试：
 
-### 本地运行管道（从邮箱读取）
+~~~bash
+python -m unittest discover -s tests -v
+~~~
 
-确保 `.env` 已配置，然后：
+启动静态服务：
 
-```bash
-python pipeline/run_pipeline.py
-```
+~~~bash
+python -m http.server 8766 --directory web/static
+~~~
 
-### 启动 Flask 开发服务器
+访问 dashboard.html 或 customer-login-dashboard.html。
 
-```bash
-python web/app.py
-# 访问 http://localhost:5000
-```
+## 手动运行与排查
 
-### 同步代码到 GitHub 仓库
+- GitHub仓库 → Actions → 选择对应工作流 → Run workflow。
+- 登录看板工作流失败时，先检查邮件是否按时到达，再检查Secrets是否有效。
+- 页面保留上一版JSON；新数据校验失败时不会覆盖线上可用版本。
+- Actions日志只输出主题时间和聚合数量，不输出客户明细或授权码。
 
-改完根目录代码后，同步到 `github/` 远程仓库目录：
+## 发布机制
 
-```bash
-python sync_to_github.py          # 同步
-python sync_to_github.py --check  # 仅检查差异
-```
-
-同步后进入 `github/` 目录提交并推送即可。
-
-### 修改看板样式
-
-编辑 `web/templates/dashboard.html`（Flask 版）或 `docs/index.html`（GitHub Pages 版），两个文件保持同步。
-
-主要修改点：
-- **颜色变量**：CSS `:root` 中的 `--dark-blue`、`--gold`、`--accent` 等
-- **图表配色**：JS 中的 `CHART_COLORS` 数组
-- **字段/列**：HTML 中的 `<th>` 和 JS 中的 `updateAggTable`、`updateDetailTable` 函数
-
----
-
-## 踩坑记录
-
-### 1. IMAP 中文主题搜索
-
-**问题**：`imaplib` 默认使用 ASCII 编码，搜索中文邮件主题时报错 `could not parse command`。
-
-**解决**：
-```python
-mail._encoding = "utf-8"
-mail.search("UTF-8", "SUBJECT", '"【卡单】【数据】"')
-```
-
-### 2. 日期搜索的时区问题
-
-**问题**：IMAP 的 `ON` 日期搜索使用服务器时区，GitHub Actions runner 是 UTC 时区，北京时间 9:30 对应 UTC 1:30，此时 IMAP 服务器的"今天"可能还是昨天。
-
-**解决**：搜索逻辑加了三层兜底——先搜今天，没结果搜昨天，再没结果取最近所有匹配邮件的最新一封。
-
-### 3. GitHub Actions 定时时区
-
-**问题**：GitHub Actions 的 cron 使用 UTC 时区，需要转换。
-
-**解决**：北京时间 = UTC + 8。9:30 北京 = `30 1 * * *` UTC，10:00 北京 = `0 2 * * *` UTC。
-
-### 4. GitHub Pages 首次部署延迟
-
-**问题**：首次启用 Pages 后，页面可能需要 1-2 分钟才能访问。
-
-**解决**：通过 GitHub API 检查 Pages 状态，`status: "built"` 表示部署完成。
-
-### 5. 端口占用（本地开发）
-
-**问题**：Flask 开发服务器异常退出后，端口 5000 被旧进程占用。
-
-**解决**：用 PowerShell `Get-NetTCPConnection -LocalPort 5000` 查找占用进程，`Stop-Process -Id <pid> -Force` 杀掉。
-
-### 6. 空白值处理
-
-**问题**：Excel 中大区、组别等字段有空白值，导致聚合时出现 `NaN`。
-
-**解决**：在 `excel_parser.py` 中统一处理——`fillna("公海")` + `replace("", "公海")` + `replace("nan", "公海")`。
-
-### 7. JSON 序列化
-
-**问题**：pandas 的 `NaN`、`Timestamp` 等类型无法直接 JSON 序列化。
-
-**解决**：在 `data_processor.py` 中逐行处理，`NaN` 转空字符串，`float` 保留 2 位小数，其他转为 Python 原生类型。
-
-### 8. 饼图标签重叠
-
-**问题**：异常原因分类的标签较长（如"客户异常/资质过期"），饼图图例和饼图本身重叠。
-
-**解决**：将异常原因从饼图改为横向柱状图，标签放在 Y 轴，数值标在柱状条右侧。
-
----
-
-## 扩展方向
-
-| 方向 | 说明 | 实现思路 |
-|------|------|---------|
-| 历史趋势 | 展示多日数据变化趋势 | 引入 SQLite，每日数据入库，看板增加折线图 |
-| 多日对比 | 选择日期范围对比 | 日期选择器 + 后端聚合 API |
-| 权限控制 | 看板需要密码访问 | 前端 JS 简单密码验证 或 GitHub Pages 加密 |
-| 邮件通知 | 看板更新后发通知 | GitHub Actions 中增加发邮件步骤 |
-| 多邮件源 | 支持多封邮件汇总 | email_reader 支持配置多个搜索条件 |
-| 数据校验 | 自动检查数据异常 | pipeline 中增加数据质量检查步骤 |
-
----
+工作流只在数据内容发生变化时提交新版本。GitHub Pages从docs目录发布；提交后通常需要几十秒到数分钟完成刷新。
 
 ## 相关链接
 
-- **GitHub 仓库**：https://github.com/shujunfeng1/order-dashboard
-- **GitHub Pages 看板**：https://shujunfeng1.github.io/order-dashboard/
-- **Actions 运行记录**：https://github.com/shujunfeng1/order-dashboard/actions
-- **ECharts 文档**：https://echarts.apache.org/zh/index.html
-- **GitHub Actions 文档**：https://docs.github.com/en/actions
+- GitHub仓库：https://github.com/shujunfeng1/order-dashboard
+- GitHub Pages：https://shujunfeng1.github.io/order-dashboard/
+- Actions：https://github.com/shujunfeng1/order-dashboard/actions
