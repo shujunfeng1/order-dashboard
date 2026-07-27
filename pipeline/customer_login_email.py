@@ -9,7 +9,7 @@ import re
 from dataclasses import dataclass
 from datetime import datetime, time, timedelta
 from email.header import decode_header, make_header
-from email.utils import parsedate_to_datetime
+from email.utils import parseaddr, parsedate_to_datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -99,25 +99,41 @@ def find_latest_email(
     email_config = config["email"]
     local_now = (now or datetime.now(BEIJING_TZ)).astimezone(BEIJING_TZ)
     lookback_days = int(email_config.get("lookback_days", 2))
-    start_date = (local_now.date() - timedelta(days=lookback_days)).strftime("%d-%b-%Y")
-    sender_filter = email_config.get("sender_filter", "").strip()
+    earliest_report_date = local_now.date() - timedelta(days=lookback_days)
+    sender_filter = email_config.get("sender_filter", "").strip().casefold()
     subject_prefix = email_config["subject_prefix"]
+    scan_limit = int(email_config.get("scan_recent_messages", 500))
+    expected = expected_report_datetime(
+        local_now,
+        email_config.get("report_slots", ["10:45", "13:15", "16:40"]),
+    )
 
-    criteria: list[str] = ["SINCE", start_date]
-    if sender_filter:
-        criteria.extend(["FROM", sender_filter])
-    status, response = mailbox.search(None, *criteria)
-    if status != "OK":
-        raise RuntimeError("IMAP search failed")
+    # The enterprise IMAP server can take longer than the socket timeout when
+    # SEARCH scans a large INBOX. Reading recent message headers newest-first
+    # avoids that server-side full-mailbox query and normally finds the report
+    # within the first few messages after its scheduled delivery.
+    status, response = mailbox.select("INBOX", readonly=True)
+    if status != "OK" or not response or not response[0]:
+        raise RuntimeError("Unable to read INBOX message count")
+    message_count = int(response[0])
+    first_message = max(1, message_count - scan_limit + 1)
 
     candidates: list[EmailCandidate] = []
-    for message_id in response[0].split():
+    for sequence_number in range(message_count, first_message - 1, -1):
+        message_id = str(sequence_number).encode("ascii")
         msg = _header_message(mailbox, message_id)
+        sender = decode_mime_header(msg.get("From"))
+        sender_address = parseaddr(sender)[1].casefold()
+        if sender_filter and sender_address != sender_filter:
+            continue
+
         subject = decode_mime_header(msg.get("Subject"))
         if not subject.startswith(subject_prefix):
             continue
         report_datetime = parse_report_datetime(subject)
         if report_datetime is None or report_datetime > local_now + timedelta(minutes=5):
+            continue
+        if report_datetime.date() < earliest_report_date:
             continue
 
         received_at = parsedate_to_datetime(msg.get("Date"))
@@ -126,30 +142,31 @@ def find_latest_email(
         elif received_at.tzinfo is None:
             received_at = received_at.replace(tzinfo=BEIJING_TZ)
         received_at = received_at.astimezone(BEIJING_TZ)
-        candidates.append(
-            EmailCandidate(
-                message_id=message_id,
-                subject=subject,
-                sender=decode_mime_header(msg.get("From")),
-                report_datetime=report_datetime,
-                received_at=received_at,
-            )
+        candidate = EmailCandidate(
+            message_id=message_id,
+            subject=subject,
+            sender=sender,
+            report_datetime=report_datetime,
+            received_at=received_at,
         )
+        candidates.append(candidate)
+
+        if expected and candidate.report_datetime >= expected:
+            return candidate
+        if not require_current_slot:
+            return candidate
 
     if not candidates:
-        raise FreshEmailNotFound("No matching customer-login email was found")
+        raise FreshEmailNotFound(
+            f"No matching customer-login email was found in the latest {scan_limit} messages"
+        )
 
     latest = max(candidates, key=lambda item: item.report_datetime)
-    if require_current_slot:
-        expected = expected_report_datetime(
-            local_now,
-            email_config.get("report_slots", ["10:45", "13:15", "16:40"]),
+    if require_current_slot and expected and latest.report_datetime < expected:
+        raise FreshEmailNotFound(
+            f"Latest report is {latest.report_datetime:%Y-%m-%d %H:%M}; "
+            f"expected at least {expected:%Y-%m-%d %H:%M}"
         )
-        if expected and latest.report_datetime < expected:
-            raise FreshEmailNotFound(
-                f"Latest report is {latest.report_datetime:%Y-%m-%d %H:%M}; "
-                f"expected at least {expected:%Y-%m-%d %H:%M}"
-            )
     return latest
 
 
@@ -212,5 +229,5 @@ def fetch_latest_attachment(
     finally:
         try:
             mailbox.logout()
-        except imaplib.IMAP4.error:
+        except (imaplib.IMAP4.error, OSError):
             pass
