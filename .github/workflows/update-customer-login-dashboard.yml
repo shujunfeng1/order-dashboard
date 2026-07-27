@@ -47,7 +47,7 @@ jobs:
               exit 0
             fi
             if [ "${attempt}" -lt 3 ]; then
-              echo "目标时段邮件尚未到达，60 秒后重试"
+              echo "邮件获取或处理失败，可能是邮件延迟或临时网络异常，60 秒后重试"
               sleep 60
             fi
           done
