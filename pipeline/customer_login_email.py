@@ -105,7 +105,7 @@ def find_latest_email(
     scan_limit = int(email_config.get("scan_recent_messages", 500))
     expected = expected_report_datetime(
         local_now,
-        email_config.get("report_slots", ["10:45", "13:15", "16:40"]),
+        email_config.get("report_slots", ["16:40"]),
     )
 
     # The enterprise IMAP server can take longer than the socket timeout when

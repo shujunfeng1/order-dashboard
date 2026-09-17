@@ -53,9 +53,11 @@ class CustomerLoginPipelineTests(unittest.TestCase):
         self.assertEqual(parsed.strftime("%Y-%m-%d %H:%M"), "2026-07-20 16:40")
 
     def test_expected_slot(self):
-        now = datetime(2026, 7, 20, 13, 20, tzinfo=ZoneInfo("Asia/Shanghai"))
-        expected = expected_report_datetime(now, ["10:45", "13:15", "16:40"])
-        self.assertEqual(expected.strftime("%H:%M"), "13:15")
+        before_report = datetime(2026, 7, 20, 13, 20, tzinfo=ZoneInfo("Asia/Shanghai"))
+        after_report = datetime(2026, 7, 20, 16, 45, tzinfo=ZoneInfo("Asia/Shanghai"))
+        self.assertIsNone(expected_report_datetime(before_report, ["16:40"]))
+        expected = expected_report_datetime(after_report, ["16:40"])
+        self.assertEqual(expected.strftime("%H:%M"), "16:40")
 
     def test_deduplication_and_public_pool(self):
         frame = pd.DataFrame([
@@ -82,7 +84,7 @@ class CustomerLoginPipelineTests(unittest.TestCase):
                 "sender_filter": "hm.lu@ybm100.com",
                 "subject_prefix": "【今日登录客户明细】",
                 "lookback_days": 2,
-                "report_slots": ["10:45", "13:15", "16:40"],
+                "report_slots": ["16:40"],
                 "scan_recent_messages": 10,
             }
         }
@@ -103,7 +105,7 @@ class CustomerLoginPipelineTests(unittest.TestCase):
                 "sender_filter": "hm.lu@ybm100.com",
                 "subject_prefix": "【今日登录客户明细】",
                 "lookback_days": 2,
-                "report_slots": ["10:45", "13:15", "16:40"],
+                "report_slots": ["16:40"],
                 "scan_recent_messages": 10,
             }
         }
