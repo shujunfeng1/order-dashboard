@@ -1,0 +1,641 @@
+{
+  "schema_version": 1,
+  "data_time": "2026-09-28T15:44:10.738000+08:00",
+  "roles": [
+    "电销部负责人",
+    "BDM",
+    "战区负责人",
+    "省区负责人"
+  ],
+  "summary": {
+    "people": 78,
+    "customers": 10598,
+    "zero_people": 3
+  },
+  "rows": [
+    {
+      "region": "电销中心",
+      "province": "电销",
+      "team": "电销一部",
+      "name": "冰蚕",
+      "role": "电销部负责人",
+      "customers": 210
+    },
+    {
+      "region": "电销中心",
+      "province": "电销",
+      "team": "电销三部",
+      "name": "芍药草",
+      "role": "电销部负责人",
+      "customers": 179
+    },
+    {
+      "region": "电销中心",
+      "province": "电销",
+      "team": "电销二部",
+      "name": "雅凡",
+      "role": "电销部负责人",
+      "customers": 211
+    },
+    {
+      "region": "电销中心",
+      "province": "电销",
+      "team": "电销四部",
+      "name": "全蝎",
+      "role": "电销部负责人",
+      "customers": 260
+    },
+    {
+      "region": "中部大区",
+      "province": "内蒙古",
+      "team": "蒙东组",
+      "name": "起航",
+      "role": "BDM",
+      "customers": 63
+    },
+    {
+      "region": "中部大区",
+      "province": "内蒙古",
+      "team": "蒙中组",
+      "name": "百阳",
+      "role": "BDM",
+      "customers": 31
+    },
+    {
+      "region": "中部大区",
+      "province": "内蒙古",
+      "team": "蒙西组",
+      "name": "黄煌",
+      "role": "BDM",
+      "customers": 70
+    },
+    {
+      "region": "中部大区",
+      "province": "山西",
+      "team": "晋中组",
+      "name": "挽宸",
+      "role": "BDM",
+      "customers": 202
+    },
+    {
+      "region": "中部大区",
+      "province": "山西",
+      "team": "晋北组",
+      "name": "晨晖",
+      "role": "BDM",
+      "customers": 210
+    },
+    {
+      "region": "中部大区",
+      "province": "河北",
+      "team": "冀北组",
+      "name": "风将",
+      "role": "BDM",
+      "customers": 25
+    },
+    {
+      "region": "中部大区",
+      "province": "河北",
+      "team": "冀南组",
+      "name": "绿荫",
+      "role": "BDM",
+      "customers": 136
+    },
+    {
+      "region": "中部大区",
+      "province": "豫东",
+      "team": "新商周组",
+      "name": "毅力",
+      "role": "BDM",
+      "customers": 24
+    },
+    {
+      "region": "中部大区",
+      "province": "豫东",
+      "team": "驻许信组",
+      "name": "草辟",
+      "role": "BDM",
+      "customers": 149
+    },
+    {
+      "region": "中部大区",
+      "province": "豫西",
+      "team": "南山组",
+      "name": "阿艺",
+      "role": "BDM",
+      "customers": 64
+    },
+    {
+      "region": "中部大区",
+      "province": "豫西",
+      "team": "洛阳焦作组",
+      "name": "常青",
+      "role": "BDM",
+      "customers": 167
+    },
+    {
+      "region": "北部大区",
+      "province": "吉林",
+      "team": "吉林组",
+      "name": "东源",
+      "role": "BDM",
+      "customers": 69
+    },
+    {
+      "region": "北部大区",
+      "province": "吉林",
+      "team": "长通组",
+      "name": "展堂",
+      "role": "BDM",
+      "customers": 118
+    },
+    {
+      "region": "北部大区",
+      "province": "安徽",
+      "team": "合肥组",
+      "name": "阿海",
+      "role": "BDM",
+      "customers": 23
+    },
+    {
+      "region": "北部大区",
+      "province": "安徽",
+      "team": "阜阳组",
+      "name": "柏驭",
+      "role": "BDM",
+      "customers": 38
+    },
+    {
+      "region": "北部大区",
+      "province": "山东",
+      "team": "鲁东组",
+      "name": "虎骨",
+      "role": "BDM",
+      "customers": 97
+    },
+    {
+      "region": "北部大区",
+      "province": "山东",
+      "team": "鲁中组",
+      "name": "婕拉",
+      "role": "BDM",
+      "customers": 193
+    },
+    {
+      "region": "北部大区",
+      "province": "山东",
+      "team": "鲁西组",
+      "name": "友途",
+      "role": "BDM",
+      "customers": 76
+    },
+    {
+      "region": "北部大区",
+      "province": "江苏",
+      "team": "南通组",
+      "name": "丰秋",
+      "role": "BDM",
+      "customers": 14
+    },
+    {
+      "region": "北部大区",
+      "province": "江苏",
+      "team": "徐州组",
+      "name": "浩克",
+      "role": "BDM",
+      "customers": 95
+    },
+    {
+      "region": "北部大区",
+      "province": "江苏",
+      "team": "盐城组",
+      "name": "大凯",
+      "role": "BDM",
+      "customers": 16
+    },
+    {
+      "region": "北部大区",
+      "province": "浙北",
+      "team": "宁绍组",
+      "name": "仲明",
+      "role": "BDM",
+      "customers": 4
+    },
+    {
+      "region": "北部大区",
+      "province": "浙北",
+      "team": "杭嘉湖组",
+      "name": "麦动",
+      "role": "BDM",
+      "customers": 30
+    },
+    {
+      "region": "北部大区",
+      "province": "浙南",
+      "team": "金丽衢组",
+      "name": "墨云",
+      "role": "BDM",
+      "customers": 151
+    },
+    {
+      "region": "北部大区",
+      "province": "福建",
+      "team": "泉厦组",
+      "name": "酒梦",
+      "role": "BDM",
+      "customers": 418
+    },
+    {
+      "region": "北部大区",
+      "province": "福建",
+      "team": "闽北组",
+      "name": "云樱",
+      "role": "BDM",
+      "customers": 100
+    },
+    {
+      "region": "北部大区",
+      "province": "辽宁",
+      "team": "辽西组",
+      "name": "金戈",
+      "role": "BDM",
+      "customers": 20
+    },
+    {
+      "region": "北部大区",
+      "province": "黑龙江",
+      "team": "龙哈组",
+      "name": "昱扬",
+      "role": "BDM",
+      "customers": 2
+    },
+    {
+      "region": "北部大区",
+      "province": "黑龙江",
+      "team": "龙江东组",
+      "name": "德伶",
+      "role": "BDM",
+      "customers": 18
+    },
+    {
+      "region": "北部大区",
+      "province": "黑龙江",
+      "team": "龙江西组",
+      "name": "北寻",
+      "role": "BDM",
+      "customers": 66
+    },
+    {
+      "region": "华南大区",
+      "province": "云南",
+      "team": "滇中组",
+      "name": "太乙",
+      "role": "BDM",
+      "customers": 125
+    },
+    {
+      "region": "华南大区",
+      "province": "云南",
+      "team": "滇南组",
+      "name": "雕忻",
+      "role": "BDM",
+      "customers": 184
+    },
+    {
+      "region": "华南大区",
+      "province": "云南",
+      "team": "滇西组",
+      "name": "墨兰",
+      "role": "BDM",
+      "customers": 220
+    },
+    {
+      "region": "华南大区",
+      "province": "四川",
+      "team": "川南组",
+      "name": "天缘",
+      "role": "BDM",
+      "customers": 134
+    },
+    {
+      "region": "华南大区",
+      "province": "四川",
+      "team": "川西组",
+      "name": "班罗",
+      "role": "BDM",
+      "customers": 26
+    },
+    {
+      "region": "华南大区",
+      "province": "广西",
+      "team": "广西一组",
+      "name": "惠惠",
+      "role": "BDM",
+      "customers": 213
+    },
+    {
+      "region": "华南大区",
+      "province": "江西",
+      "team": "赣南组",
+      "name": "一文",
+      "role": "BDM",
+      "customers": 365
+    },
+    {
+      "region": "华南大区",
+      "province": "湖南",
+      "team": "娄益德组",
+      "name": "喜地",
+      "role": "BDM",
+      "customers": 85
+    },
+    {
+      "region": "华南大区",
+      "province": "湖南",
+      "team": "永郴组",
+      "name": "潇洒",
+      "role": "BDM",
+      "customers": 56
+    },
+    {
+      "region": "华南大区",
+      "province": "湖南",
+      "team": "邵怀组",
+      "name": "山丛",
+      "role": "BDM",
+      "customers": 112
+    },
+    {
+      "region": "华南大区",
+      "province": "湖南",
+      "team": "长岳组",
+      "name": "公页",
+      "role": "BDM",
+      "customers": 32
+    },
+    {
+      "region": "华南大区",
+      "province": "湖南",
+      "team": "长株组",
+      "name": "浦黄",
+      "role": "BDM",
+      "customers": 19
+    },
+    {
+      "region": "华南大区",
+      "province": "粤东",
+      "team": "客潮组",
+      "name": "朝酩",
+      "role": "BDM",
+      "customers": 128
+    },
+    {
+      "region": "华南大区",
+      "province": "粤东",
+      "team": "湛茂阳组",
+      "name": "癍痧",
+      "role": "BDM",
+      "customers": 552
+    },
+    {
+      "region": "华南大区",
+      "province": "粤西",
+      "team": "东莞组",
+      "name": "七叶",
+      "role": "BDM",
+      "customers": 662
+    },
+    {
+      "region": "华南大区",
+      "province": "粤西",
+      "team": "广州组",
+      "name": "易寒",
+      "role": "BDM",
+      "customers": 522
+    },
+    {
+      "region": "华南大区",
+      "province": "鄂东",
+      "team": "孝武组",
+      "name": "叶桂",
+      "role": "BDM",
+      "customers": 68
+    },
+    {
+      "region": "华南大区",
+      "province": "鄂东",
+      "team": "新咸黄组",
+      "name": "木言",
+      "role": "BDM",
+      "customers": 34
+    },
+    {
+      "region": "华南大区",
+      "province": "鄂东",
+      "team": "鄂黄组",
+      "name": "红梅",
+      "role": "BDM",
+      "customers": 206
+    },
+    {
+      "region": "华南大区",
+      "province": "鄂西",
+      "team": "宜恩组",
+      "name": "冬瓜",
+      "role": "BDM",
+      "customers": 512
+    },
+    {
+      "region": "华南大区",
+      "province": "鄂西",
+      "team": "荆潜仙组",
+      "name": "沐言",
+      "role": "BDM",
+      "customers": 30
+    },
+    {
+      "region": "华南大区",
+      "province": "重庆",
+      "team": "渝西北组",
+      "name": "西夏",
+      "role": "BDM",
+      "customers": 614
+    },
+    {
+      "region": "华南大区",
+      "province": "湖南",
+      "team": "湖南销售部",
+      "name": "启行",
+      "role": "战区负责人",
+      "customers": 218
+    },
+    {
+      "region": "中部大区",
+      "province": "山西",
+      "team": "山西销售部",
+      "name": "穿破",
+      "role": "省区负责人",
+      "customers": 283
+    },
+    {
+      "region": "中部大区",
+      "province": "河北",
+      "team": "河北销售部",
+      "name": "梓实",
+      "role": "省区负责人",
+      "customers": 10
+    },
+    {
+      "region": "中部大区",
+      "province": "豫东",
+      "team": "豫东销售部",
+      "name": "南宫",
+      "role": "省区负责人",
+      "customers": 930
+    },
+    {
+      "region": "中部大区",
+      "province": "豫西",
+      "team": "豫西销售部",
+      "name": "鹿丸",
+      "role": "省区负责人",
+      "customers": 104
+    },
+    {
+      "region": "北部大区",
+      "province": "吉林",
+      "team": "吉林销售部",
+      "name": "前锋",
+      "role": "省区负责人",
+      "customers": 3
+    },
+    {
+      "region": "北部大区",
+      "province": "安徽",
+      "team": "安徽销售部",
+      "name": "吴铭",
+      "role": "省区负责人",
+      "customers": 1
+    },
+    {
+      "region": "北部大区",
+      "province": "山东",
+      "team": "山东销售部",
+      "name": "和田",
+      "role": "省区负责人",
+      "customers": 1
+    },
+    {
+      "region": "北部大区",
+      "province": "江苏",
+      "team": "江苏销售部",
+      "name": "陈皮",
+      "role": "省区负责人",
+      "customers": 1
+    },
+    {
+      "region": "北部大区",
+      "province": "浙北",
+      "team": "浙北销售部",
+      "name": "云帆",
+      "role": "省区负责人",
+      "customers": 2
+    },
+    {
+      "region": "北部大区",
+      "province": "浙南",
+      "team": "浙南销售部",
+      "name": "千城",
+      "role": "省区负责人",
+      "customers": 0
+    },
+    {
+      "region": "北部大区",
+      "province": "福建",
+      "team": "福建销售部",
+      "name": "沐梓",
+      "role": "省区负责人",
+      "customers": 0
+    },
+    {
+      "region": "北部大区",
+      "province": "辽宁",
+      "team": "辽宁销售部",
+      "name": "破风",
+      "role": "省区负责人",
+      "customers": 4
+    },
+    {
+      "region": "北部大区",
+      "province": "黑龙江",
+      "team": "黑龙江销售部",
+      "name": "凤羽",
+      "role": "省区负责人",
+      "customers": 2
+    },
+    {
+      "region": "华南大区",
+      "province": "云南",
+      "team": "云南销售部",
+      "name": "川芎",
+      "role": "省区负责人",
+      "customers": 105
+    },
+    {
+      "region": "华南大区",
+      "province": "四川",
+      "team": "四川销售部",
+      "name": "天沐",
+      "role": "省区负责人",
+      "customers": 15
+    },
+    {
+      "region": "华南大区",
+      "province": "湖南",
+      "team": "湖南销售部",
+      "name": "宗介",
+      "role": "省区负责人",
+      "customers": 3
+    },
+    {
+      "region": "华南大区",
+      "province": "粤东",
+      "team": "粤东销售部",
+      "name": "天恒",
+      "role": "省区负责人",
+      "customers": 102
+    },
+    {
+      "region": "华南大区",
+      "province": "粤西",
+      "team": "粤西销售部",
+      "name": "香荔",
+      "role": "省区负责人",
+      "customers": 32
+    },
+    {
+      "region": "华南大区",
+      "province": "鄂东",
+      "team": "鄂东销售部",
+      "name": "凌霄",
+      "role": "省区负责人",
+      "customers": 0
+    },
+    {
+      "region": "华南大区",
+      "province": "鄂西",
+      "team": "鄂西销售部",
+      "name": "阿布",
+      "role": "省区负责人",
+      "customers": 31
+    },
+    {
+      "region": "华南大区",
+      "province": "重庆",
+      "team": "重庆销售部",
+      "name": "康悦",
+      "role": "省区负责人",
+      "customers": 303
+    }
+  ]
+}
