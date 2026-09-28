@@ -1,5 +1,21 @@
 # 在线业务数据看板
 
+## M级私海客户看板（2026-09-28新增）
+
+- 页面：https://shujunfeng1.github.io/order-dashboard/m-private-dashboard.html
+- 三个看板顶部支持相互切换。新增页沿用深蓝页头、白底和无千分位的客户数量格式。
+- 数据源：Redash查询12127。每天北京时间16:50（UTC 08:50）主动执行查询，使用用户级Key和 `max_age=0`；最多等待300秒，不用旧缓存冒充本次结果。
+- Key保存在GitHub Secret `REDASH_M_PRIVATE_API_KEY`。浏览器仅访问发布后的聚合JSON，不直接调用Redash。
+- 范围：在职的电销部负责人、BDM、战区负责人、省区负责人；仅使用“普药私海客户数”，不混用“私海客户数”。
+- 人员以源OA ID检查唯一性；发布字段仅有大区、省区、团队、花名、岗位和普药私海客户数，OA ID、入职日期和其他源行不发布。
+- 客户合计为各人员数值相加，未经跨人员去重；人均包含零客户人员。空筛选结果的人均显示“—”。
+- 页面提供大区/省区/团队/岗位联动、花名搜索、零客户快捷筛选、岗位合计/人均图、最高/最低15人排名和可排序明细。
+- 数据时间取Redash结果的实际生成时间，以北京时间显示；48小时以上显示过期提示。源结果时间缺失、重复人员、负数/空客户数、空结果或查询失败均阻止覆盖已有数据。
+- 工作流：`.github/workflows/update-m-private-dashboard.yml`，支持手动运行。查询失败时先检查Redash权限、源查询和Secret有效性。
+- 管道：`pipeline/run_m_private_pipeline.py`；`redash_api_query.py`复用本地redash-api-query技能的标准客户端。原始结果仅在内存中转换，不保存原始导出文件。
+- 本地回归：`python -m unittest discover -s tests -v`；真实执行需通过环境变量注入Key后运行 `python pipeline/run_m_private_pipeline.py`。
+- 首次真实查询结果：78人、普药私海客户数合计10598、零客户3人；后续以页面数据时间及最新查询结果为准。
+
 通过企业邮箱自动获取Excel附件，生成可公开访问的静态业务看板。项目由GitHub Actions运行，不依赖个人电脑开机。
 
 ## 线上看板

@@ -378,7 +378,9 @@
         }
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-thumb { background: var(--border); }
-    </style>
+
+.dashboard-nav{flex-wrap:wrap;max-width:100%}
+</style>
 </head>
 <body>
     <div class="loading-overlay" id="loadingOverlay">
@@ -392,7 +394,7 @@
             <div class="subtitle" id="subTitle">数据加载中...</div>
         </div>
         <div class="header-right">
-            <nav class="dashboard-nav" aria-label="看板切换"><span class="active">卡单数据看板</span><a href="./customer-login-dashboard.html">登录转化看板</a></nav>
+            <nav class="dashboard-nav" aria-label="看板切换"><span class="active">卡单数据看板</span><a href="./customer-login-dashboard.html">登录转化看板</a><a href="./m-private-dashboard.html">M级私海客户</a></nav>
             <span class="update-time" id="updateTime">--</span>
             <button class="btn-action" onclick="downloadExcel()">下载明细</button>
             <button class="btn-action" onclick="window.print()">导出看板</button>
