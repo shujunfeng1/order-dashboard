@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "data_time": "2026-10-13T02:13:43.332000+08:00",
+  "data_time": "2026-10-14T00:27:56.163000+08:00",
   "roles": [
     "电销部负责人",
     "BDM",
@@ -8,8 +8,8 @@
     "省区负责人"
   ],
   "summary": {
-    "people": 80,
-    "customers": 12289,
+    "people": 79,
+    "customers": 12380,
     "zero_people": 1
   },
   "rows": [
@@ -19,7 +19,7 @@
       "team": "电销一部",
       "name": "冰蚕",
       "role": "电销部负责人",
-      "customers": 146
+      "customers": 168
     },
     {
       "region": "电销中心",
@@ -27,7 +27,7 @@
       "team": "电销三部",
       "name": "芍药草",
       "role": "电销部负责人",
-      "customers": 593
+      "customers": 744
     },
     {
       "region": "电销中心",
@@ -35,7 +35,7 @@
       "team": "电销二部",
       "name": "雅凡",
       "role": "电销部负责人",
-      "customers": 302
+      "customers": 323
     },
     {
       "region": "电销中心",
@@ -43,7 +43,7 @@
       "team": "电销四部",
       "name": "全蝎",
       "role": "电销部负责人",
-      "customers": 426
+      "customers": 512
     },
     {
       "region": "中部大区",
@@ -51,7 +51,7 @@
       "team": "蒙东组",
       "name": "起航",
       "role": "BDM",
-      "customers": 17
+      "customers": 22
     },
     {
       "region": "中部大区",
@@ -59,7 +59,7 @@
       "team": "蒙中组",
       "name": "百阳",
       "role": "BDM",
-      "customers": 83
+      "customers": 81
     },
     {
       "region": "中部大区",
@@ -67,7 +67,7 @@
       "team": "蒙西组",
       "name": "黄煌",
       "role": "BDM",
-      "customers": 112
+      "customers": 116
     },
     {
       "region": "中部大区",
@@ -75,7 +75,7 @@
       "team": "晋中组",
       "name": "挽宸",
       "role": "BDM",
-      "customers": 127
+      "customers": 114
     },
     {
       "region": "中部大区",
@@ -83,7 +83,7 @@
       "team": "晋北组",
       "name": "晨晖",
       "role": "BDM",
-      "customers": 100
+      "customers": 105
     },
     {
       "region": "中部大区",
@@ -91,7 +91,7 @@
       "team": "冀北组",
       "name": "风将",
       "role": "BDM",
-      "customers": 50
+      "customers": 48
     },
     {
       "region": "中部大区",
@@ -99,7 +99,7 @@
       "team": "冀南组",
       "name": "绿荫",
       "role": "BDM",
-      "customers": 143
+      "customers": 147
     },
     {
       "region": "中部大区",
@@ -107,7 +107,7 @@
       "team": "安濮鹤开组",
       "name": "一味",
       "role": "BDM",
-      "customers": 325
+      "customers": 324
     },
     {
       "region": "中部大区",
@@ -115,7 +115,7 @@
       "team": "新商周组",
       "name": "毅力",
       "role": "BDM",
-      "customers": 136
+      "customers": 134
     },
     {
       "region": "中部大区",
@@ -131,7 +131,7 @@
       "team": "南山组",
       "name": "阿艺",
       "role": "BDM",
-      "customers": 42
+      "customers": 41
     },
     {
       "region": "中部大区",
@@ -139,7 +139,7 @@
       "team": "洛阳焦作组",
       "name": "常青",
       "role": "BDM",
-      "customers": 154
+      "customers": 153
     },
     {
       "region": "北部大区",
@@ -147,7 +147,7 @@
       "team": "吉林组",
       "name": "东源",
       "role": "BDM",
-      "customers": 88
+      "customers": 91
     },
     {
       "region": "北部大区",
@@ -155,7 +155,7 @@
       "team": "长通组",
       "name": "展堂",
       "role": "BDM",
-      "customers": 287
+      "customers": 286
     },
     {
       "region": "北部大区",
@@ -171,7 +171,7 @@
       "team": "阜阳组",
       "name": "柏驭",
       "role": "BDM",
-      "customers": 37
+      "customers": 34
     },
     {
       "region": "北部大区",
@@ -179,7 +179,7 @@
       "team": "鲁东组",
       "name": "虎骨",
       "role": "BDM",
-      "customers": 140
+      "customers": 134
     },
     {
       "region": "北部大区",
@@ -187,7 +187,7 @@
       "team": "鲁中组",
       "name": "婕拉",
       "role": "BDM",
-      "customers": 79
+      "customers": 60
     },
     {
       "region": "北部大区",
@@ -195,7 +195,7 @@
       "team": "鲁西组",
       "name": "友途",
       "role": "BDM",
-      "customers": 183
+      "customers": 184
     },
     {
       "region": "北部大区",
@@ -203,7 +203,7 @@
       "team": "南通组",
       "name": "丰秋",
       "role": "BDM",
-      "customers": 128
+      "customers": 130
     },
     {
       "region": "北部大区",
@@ -219,7 +219,7 @@
       "team": "盐城组",
       "name": "大凯",
       "role": "BDM",
-      "customers": 16
+      "customers": 15
     },
     {
       "region": "北部大区",
@@ -235,7 +235,7 @@
       "team": "杭嘉湖组",
       "name": "麦动",
       "role": "BDM",
-      "customers": 111
+      "customers": 109
     },
     {
       "region": "北部大区",
@@ -251,7 +251,7 @@
       "team": "泉厦组",
       "name": "酒梦",
       "role": "BDM",
-      "customers": 256
+      "customers": 270
     },
     {
       "region": "北部大区",
@@ -259,7 +259,7 @@
       "team": "闽北组",
       "name": "云樱",
       "role": "BDM",
-      "customers": 375
+      "customers": 360
     },
     {
       "region": "北部大区",
@@ -272,18 +272,10 @@
     {
       "region": "北部大区",
       "province": "黑龙江",
-      "team": "龙哈组",
-      "name": "昱扬",
-      "role": "BDM",
-      "customers": 1
-    },
-    {
-      "region": "北部大区",
-      "province": "黑龙江",
       "team": "龙江东组",
       "name": "德伶",
       "role": "BDM",
-      "customers": 17
+      "customers": 15
     },
     {
       "region": "北部大区",
@@ -299,7 +291,7 @@
       "team": "滇中组",
       "name": "太乙",
       "role": "BDM",
-      "customers": 214
+      "customers": 212
     },
     {
       "region": "华南大区",
@@ -307,7 +299,7 @@
       "team": "滇南组",
       "name": "雕忻",
       "role": "BDM",
-      "customers": 182
+      "customers": 72
     },
     {
       "region": "华南大区",
@@ -315,7 +307,7 @@
       "team": "滇西组",
       "name": "墨兰",
       "role": "BDM",
-      "customers": 662
+      "customers": 656
     },
     {
       "region": "华南大区",
@@ -323,7 +315,7 @@
       "team": "川南组",
       "name": "天缘",
       "role": "BDM",
-      "customers": 188
+      "customers": 183
     },
     {
       "region": "华南大区",
@@ -331,7 +323,7 @@
       "team": "川西组",
       "name": "班罗",
       "role": "BDM",
-      "customers": 157
+      "customers": 140
     },
     {
       "region": "华南大区",
@@ -339,7 +331,7 @@
       "team": "广西一组",
       "name": "惠惠",
       "role": "BDM",
-      "customers": 238
+      "customers": 235
     },
     {
       "region": "华南大区",
@@ -347,7 +339,7 @@
       "team": "赣南组",
       "name": "一文",
       "role": "BDM",
-      "customers": 442
+      "customers": 438
     },
     {
       "region": "华南大区",
@@ -363,7 +355,7 @@
       "team": "宜恩组",
       "name": "冬瓜",
       "role": "BDM",
-      "customers": 546
+      "customers": 523
     },
     {
       "region": "华南大区",
@@ -371,7 +363,7 @@
       "team": "新咸黄组",
       "name": "木言",
       "role": "BDM",
-      "customers": 146
+      "customers": 145
     },
     {
       "region": "华南大区",
@@ -379,7 +371,7 @@
       "team": "荆潜仙组",
       "name": "沐言",
       "role": "BDM",
-      "customers": 77
+      "customers": 78
     },
     {
       "region": "华南大区",
@@ -387,7 +379,7 @@
       "team": "鄂黄组",
       "name": "红梅",
       "role": "BDM",
-      "customers": 135
+      "customers": 133
     },
     {
       "region": "华南大区",
@@ -395,7 +387,7 @@
       "team": "娄益德组",
       "name": "喜地",
       "role": "BDM",
-      "customers": 359
+      "customers": 360
     },
     {
       "region": "华南大区",
@@ -403,7 +395,7 @@
       "team": "永郴组",
       "name": "潇洒",
       "role": "BDM",
-      "customers": 56
+      "customers": 66
     },
     {
       "region": "华南大区",
@@ -411,7 +403,7 @@
       "team": "衡湘组",
       "name": "亦星",
       "role": "BDM",
-      "customers": 145
+      "customers": 150
     },
     {
       "region": "华南大区",
@@ -419,7 +411,7 @@
       "team": "邵怀组",
       "name": "山丛",
       "role": "BDM",
-      "customers": 276
+      "customers": 278
     },
     {
       "region": "华南大区",
@@ -427,7 +419,7 @@
       "team": "长岳组",
       "name": "公页",
       "role": "BDM",
-      "customers": 18
+      "customers": 21
     },
     {
       "region": "华南大区",
@@ -443,7 +435,7 @@
       "team": "客潮组",
       "name": "朝酩",
       "role": "BDM",
-      "customers": 125
+      "customers": 121
     },
     {
       "region": "华南大区",
@@ -459,7 +451,7 @@
       "team": "东莞组",
       "name": "七叶",
       "role": "BDM",
-      "customers": 656
+      "customers": 645
     },
     {
       "region": "华南大区",
@@ -467,7 +459,7 @@
       "team": "广州组",
       "name": "易寒",
       "role": "BDM",
-      "customers": 449
+      "customers": 452
     },
     {
       "region": "华南大区",
@@ -475,7 +467,7 @@
       "team": "渝西北组",
       "name": "西夏",
       "role": "BDM",
-      "customers": 312
+      "customers": 338
     },
     {
       "region": "华南大区",
@@ -483,7 +475,7 @@
       "team": "湖北销售部",
       "name": "天恒",
       "role": "战区负责人",
-      "customers": 9
+      "customers": 8
     },
     {
       "region": "华南大区",
@@ -499,7 +491,7 @@
       "team": "山西销售部",
       "name": "穿破",
       "role": "省区负责人",
-      "customers": 103
+      "customers": 89
     },
     {
       "region": "中部大区",
@@ -507,7 +499,7 @@
       "team": "河北销售部",
       "name": "梓实",
       "role": "省区负责人",
-      "customers": 26
+      "customers": 25
     },
     {
       "region": "中部大区",
@@ -515,7 +507,7 @@
       "team": "豫东销售部",
       "name": "南宫",
       "role": "省区负责人",
-      "customers": 626
+      "customers": 647
     },
     {
       "region": "中部大区",
@@ -523,7 +515,7 @@
       "team": "豫西销售部",
       "name": "鹿丸",
       "role": "省区负责人",
-      "customers": 70
+      "customers": 68
     },
     {
       "region": "北部大区",
@@ -531,7 +523,7 @@
       "team": "吉林销售部",
       "name": "前锋",
       "role": "省区负责人",
-      "customers": 6
+      "customers": 9
     },
     {
       "region": "北部大区",
@@ -547,7 +539,7 @@
       "team": "山东销售部",
       "name": "和田",
       "role": "省区负责人",
-      "customers": 1
+      "customers": 2
     },
     {
       "region": "北部大区",
@@ -603,7 +595,7 @@
       "team": "云南销售部",
       "name": "川芎",
       "role": "省区负责人",
-      "customers": 50
+      "customers": 32
     },
     {
       "region": "华南大区",
@@ -611,7 +603,7 @@
       "team": "四川销售部",
       "name": "天沐",
       "role": "省区负责人",
-      "customers": 22
+      "customers": 23
     },
     {
       "region": "华南大区",
@@ -619,7 +611,7 @@
       "team": "湖北销售部",
       "name": "凌霄",
       "role": "省区负责人",
-      "customers": 2
+      "customers": 3
     },
     {
       "region": "华南大区",
@@ -635,7 +627,7 @@
       "team": "粤东销售部",
       "name": "阿布",
       "role": "省区负责人",
-      "customers": 510
+      "customers": 505
     },
     {
       "region": "华南大区",
@@ -651,7 +643,7 @@
       "team": "重庆销售部",
       "name": "康悦",
       "role": "省区负责人",
-      "customers": 132
+      "customers": 128
     }
   ]
 }
