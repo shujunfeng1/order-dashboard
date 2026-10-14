@@ -1,5 +1,13 @@
 # 在线业务数据看板
 
+## 2026-10-14 邮箱系统切换适配
+
+- IMAP服务器及账号保持原配置，新授权码只更新GitHub Secret `EMAIL_PASSWORD`。
+- 新服务器会忽略中文主题搜索条件。卡单下载前必须校验解码后的主题，避免处理无关附件。
+- 新服务器在LOGOUT时可能主动关闭连接；退出异常不得丢弃已获取的附件。取不到附件时管道必须以失败状态退出。
+- 登录看板仅打开一次INBOX：新服务器重复SELECT时不返回EXISTS数量，曾导致“Unable to read INBOX message count”。
+- 保留登录看板每日16:45获取16:40报表的计划；上午手动验证允许读取最近已有报表，页面仍显示真实报表日期。
+
 ## M级私海客户看板（2026-09-28新增）
 
 - 页面：https://shujunfeng1.github.io/order-dashboard/m-private-dashboard.html
