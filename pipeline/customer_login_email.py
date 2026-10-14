@@ -151,7 +151,7 @@ def find_latest_email(
 
         if expected and candidate.report_datetime >= expected:
             return candidate
-        if not require_current_slot:
+        if expected is None or not require_current_slot:
             return candidate
 
     if not candidates:
