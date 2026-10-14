@@ -115,4 +115,5 @@ def run_pipeline(excel_file=None, config=None, output_dir=None, exports_dir=None
 if __name__ == "__main__":
     # 支持命令行传入 Excel 文件路径
     excel_file = sys.argv[1] if len(sys.argv) > 1 else None
-    run_pipeline(excel_file)
+    if not run_pipeline(excel_file):
+        sys.exit(1)

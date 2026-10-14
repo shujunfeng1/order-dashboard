@@ -70,10 +70,8 @@ def connect_mailbox(config: dict) -> imaplib.IMAP4_SSL:
 
     mailbox = imaplib.IMAP4_SSL(server, port, timeout=30)
     mailbox.login(account, password)
-    status, _ = mailbox.select("INBOX", readonly=True)
-    if status != "OK":
-        mailbox.logout()
-        raise RuntimeError("Unable to open INBOX")
+    # find_latest_email selects INBOX once and consumes the EXISTS response.
+    # The new mail server returns no EXISTS on a repeated SELECT.
     return mailbox
 
 

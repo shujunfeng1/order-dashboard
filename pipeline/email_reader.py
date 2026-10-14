@@ -122,6 +122,10 @@ def download_attachments(mail, message_ids, config, output_dir):
         msg = email.message_from_bytes(raw_email)
 
         subject = decode_mime_header(msg.get("Subject", ""))
+        # Some mail servers ignore non-ASCII SUBJECT search criteria.
+        # Always verify the decoded header before touching any attachment.
+        if email_config.get("subject_filter", "") not in subject:
+            continue
         sender = decode_mime_header(msg.get("From", ""))
         date_str = msg.get("Date", "")
         print(f"  主题: {subject}")
@@ -167,6 +171,7 @@ def fetch_and_download(config, output_dir=None):
     if output_dir is None:
         output_dir = Path(__file__).parent.parent / "attachments"
 
+    mail = None
     try:
         mail = connect_mailbox(config)
 
@@ -175,11 +180,9 @@ def fetch_and_download(config, output_dir=None):
 
         if not message_ids:
             print("[邮件读取] 未找到匹配邮件")
-            mail.logout()
             return []
 
         files = download_attachments(mail, message_ids, config, output_dir)
-        mail.logout()
 
         if files:
             # 只返回最新的一个文件
@@ -193,6 +196,12 @@ def fetch_and_download(config, output_dir=None):
         import traceback
         traceback.print_exc()
         return []
+    finally:
+        if mail is not None:
+            try:
+                mail.logout()
+            except (imaplib.IMAP4.error, OSError):
+                pass
 
 
 if __name__ == "__main__":
